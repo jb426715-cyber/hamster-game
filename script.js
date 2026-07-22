@@ -1,3 +1,4 @@
+// 🔥 Firebase 설정 정보
 const firebaseConfig = {
     apiKey: "AIzaSyBe9k_PBhDr7bxAngUetgFtBONGiXQQCEU",
     authDomain: "hamster-4ade3.firebaseapp.com",
@@ -13,6 +14,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let nickname = "";
+let password = "";
 let love = 0;
 let level = 1;
 let maxLove = 100;
@@ -25,8 +27,10 @@ let petDistance = 0;
 const loginScreen = document.getElementById("login-screen");
 const gameScreen = document.getElementById("game-screen");
 const nicknameInput = document.getElementById("nickname-input");
+const passwordInput = document.getElementById("password-input");
 const startBtn = document.getElementById("start-btn");
 const resetBtn = document.getElementById("reset-btn");
+const changeNickBtn = document.getElementById("change-nick-btn");
 const rankBtn = document.getElementById("rank-btn");
 const closeRankBtn = document.getElementById("close-rank-btn");
 const rankModal = document.getElementById("rank-modal");
@@ -37,19 +41,29 @@ const hamster = document.getElementById("hamster");
 const loveText = document.getElementById("love");
 const levelText = document.getElementById("level");
 
-function loadData(inputName) {
+function loadData(inputName, inputPw) {
     nickname = inputName;
+    password = inputPw;
     
     database.ref("users/" + nickname).once("value").then((snapshot) => {
         const data = snapshot.val();
+        
         if (data) {
+
+            if (data.password && data.password !== password) {
+                alert("❌ 비밀번호가 올바르지 않습니다!");
+                return;
+            }
+            
             level = data.level || 1;
             love = data.love || 0;
             maxLove = data.maxLove || 100;
         } else {
+            // 신규 유저 등록
             level = 1;
             love = 0;
             maxLove = 100;
+            alert("✨ 신규 계정이 등록되었습니다!");
         }
 
         playerNameText.textContent = nickname;
@@ -58,17 +72,67 @@ function loadData(inputName) {
 
         loginScreen.classList.add("hidden");
         gameScreen.classList.remove("hidden");
+        
+        saveData();
     });
 }
 
 function saveData() {
     if (!nickname) return;
-
+    
     database.ref("users/" + nickname).set({
         nickname: nickname,
+        password: password,
         level: level,
         love: love,
         maxLove: maxLove
+    });
+}
+
+function changeNickname() {
+
+    const inputPw = prompt("🔒 닉네임을 변경하려면 현재 비밀번호를 입력하세요:");
+    if (inputPw === null) return;
+
+    if (inputPw !== password) {
+        alert("❌ 비밀번호가 일치하지 않습니다. 닉네임을 변경할 수 없습니다.");
+        return;
+    }
+
+    const newNick = prompt("새로운 닉네임을 입력하세요 (최대 10자):", nickname);
+    if (!newNick) return;
+    
+    const trimmedNick = newNick.trim();
+    if (!trimmedNick) {
+        alert("올바른 닉네임을 입력해 주세요.");
+        return;
+    }
+    
+    if (trimmedNick === nickname) {
+        alert("기존 닉네임과 동일합니다.");
+        return;
+    }
+
+    if (trimmedNick.length > 10) {
+        alert("닉네임은 10자 이하여야 합니다.");
+        return;
+    }
+
+    database.ref("users/" + trimmedNick).once("value").then((snapshot) => {
+        if (snapshot.exists()) {
+            alert("❌ 이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요.");
+            return;
+        }
+
+        const oldNick = nickname;
+        nickname = trimmedNick;
+
+        saveData();
+
+        database.ref("users/" + oldNick).remove();
+
+        playerNameText.textContent = nickname;
+        alert(`✅ 닉네임이 '${nickname}'(으)로 변경되었습니다!`);
     });
 }
 
@@ -82,7 +146,6 @@ function loadRanking() {
             players.push(child.val());
         });
 
-
         players.reverse();
 
         players.forEach((player) => {
@@ -92,6 +155,7 @@ function loadRanking() {
         });
     });
 }
+
 function updateHamsterImage() {
     if (level >= 50) {
         hamster.src = "david_hamster.png";
@@ -115,20 +179,30 @@ function updateUI() {
 
 startBtn.addEventListener("click", () => {
     const inputVal = nicknameInput.value.trim();
+    const pwVal = passwordInput.value.trim();
+    
     if (!inputVal) {
         alert("닉네임을 입력해 주세요!");
         return;
     }
-    loadData(inputVal);
+    if (!pwVal) {
+        alert("비밀번호를 입력해 주세요!");
+        return;
+    }
+    
+    loadData(inputVal, pwVal);
 });
 
 resetBtn.addEventListener("click", () => {
-    if (confirm("정말 로그아웃하고 다른 닉네임으로 접속하시겠습니까?")) {
+    if (confirm("정말 로그아웃하고 다른 계정으로 접속하시겠습니까?")) {
         loginScreen.classList.remove("hidden");
         gameScreen.classList.add("hidden");
         nicknameInput.value = "";
+        passwordInput.value = "";
     }
 });
+
+changeNickBtn.addEventListener("click", changeNickname);
 
 rankBtn.addEventListener("click", () => {
     rankModal.classList.remove("hidden");
@@ -202,8 +276,8 @@ function addLove() {
         if (level % 10 === 0) {
             let message = "🎉 대박! Lv." + level + " 달성!";
             if (level === 10) message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
-            else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡으로 진화했습니다! 🚀";
-            else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
+            else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 T_hamster로 진화했습니다! 🚀";
+            else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군인햄으로 입대했습니다! 🫡";
             else if (level === 40) message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
             else if (level === 50) message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
             alert(message);
