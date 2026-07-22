@@ -73,7 +73,14 @@ function addLove() {
         maxLove += 20;
 
         if (levelText) levelText.textContent = level;
-        alert("🎉 레벨 업! Lv." + level);
+
+        // 🔥 레벨 10 달성 시 갸루 햄스터 이미지로 교체!
+        if (level === 10) {
+            hamster.src = "gyaru_hamster.png";
+            alert("🎉 레벨 10 달성! 햄스터가 갸루로 변신했습니다! ✨");
+        } else {
+            alert("🎉 레벨 업! Lv." + level);
+        }
     }
 
     if (loveText) loveText.textContent = `${love} / ${maxLove}`;
