@@ -1,4 +1,3 @@
-// 🔥 Firebase 설정 정보
 const firebaseConfig = {
     apiKey: "AIzaSyBe9k_PBhDr7bxAngUetgFtBONGiXQQCEU",
     authDomain: "hamster-4ade3.firebaseapp.com",
@@ -49,7 +48,6 @@ function loadData(inputName, inputPw) {
         const data = snapshot.val();
         
         if (data) {
-
             if (data.password && data.password !== password) {
                 alert("❌ 비밀번호가 올바르지 않습니다!");
                 return;
@@ -59,7 +57,6 @@ function loadData(inputName, inputPw) {
             love = data.love || 0;
             maxLove = data.maxLove || 100;
         } else {
-            // 신규 유저 등록
             level = 1;
             love = 0;
             maxLove = 100;
@@ -90,7 +87,6 @@ function saveData() {
 }
 
 function changeNickname() {
-
     const inputPw = prompt("🔒 닉네임을 변경하려면 현재 비밀번호를 입력하세요:");
     if (inputPw === null) return;
 
@@ -128,7 +124,6 @@ function changeNickname() {
         nickname = trimmedNick;
 
         saveData();
-
         database.ref("users/" + oldNick).remove();
 
         playerNameText.textContent = nickname;
@@ -150,7 +145,11 @@ function loadRanking() {
 
         players.forEach((player) => {
             const li = document.createElement("li");
-            li.textContent = `${player.nickname} - Lv.${player.level}`;
+            if (player.level >= 100) {
+                li.textContent = `${player.nickname} - Lv.100 (❤️${player.love})`;
+            } else {
+                li.textContent = `${player.nickname} - Lv.${player.level}`;
+            }
             rankList.appendChild(li);
         });
     });
@@ -173,10 +172,15 @@ function updateHamsterImage() {
 }
 
 function updateUI() {
-    if (loveText) loveText.textContent = `${love} / ${maxLove}`;
+    if (loveText) {
+        if (level >= 100) {
+            loveText.textContent = `${love} (MAX!)`;
+        } else {
+            loveText.textContent = `${love} / ${maxLove}`;
+        }
+    }
     if (levelText) levelText.textContent = level;
 }
-
 startBtn.addEventListener("click", () => {
     const inputVal = nicknameInput.value.trim();
     const pwVal = passwordInput.value.trim();
@@ -266,21 +270,25 @@ hamster.addEventListener("touchmove", (e) => {
 function addLove() {
     love++;
 
-    if (love >= maxLove) {
-        level++;
-        love = 0;
-        maxLove += 20;
+    if (level < 100) {
+        if (love >= maxLove) {
+            level++;
+            love = 0;
+            maxLove += 20;
 
-        updateHamsterImage();
+            updateHamsterImage();
 
-        if (level % 10 === 0) {
-            let message = "🎉 대박! Lv." + level + " 달성!";
-            if (level === 10) message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
-            else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡으로 진화했습니다! 🚀";
-            else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
-            else if (level === 40) message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
-            else if (level === 50) message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
-            alert(message);
+            if (level === 100) {
+                alert("👑 축하합니다! 최고 레벨인 Lv.100에 도달하셨습니다!\n이제부터 행복도는 한도 없이 끝없이 상승합니다! ✨");
+            } else if (level % 10 === 0) {
+                let message = "🎉 대박! Lv." + level + " 달성!";
+                if (level === 10) message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
+                else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡로 진화했습니다! 🚀";
+                else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
+                else if (level === 40) message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
+                else if (level === 50) message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
+                alert(message);
+            }
         }
     }
 
