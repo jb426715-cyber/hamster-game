@@ -8,7 +8,6 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
-// DOM 요소
 const loginScreen = document.getElementById("login-screen");
 const gameScreen = document.getElementById("game-screen");
 const nicknameInput = document.getElementById("nickname-input");
@@ -19,8 +18,6 @@ const playerNameText = document.getElementById("player-name");
 const hamster = document.getElementById("hamster");
 const loveText = document.getElementById("love");
 const levelText = document.getElementById("level");
-
-// --- 1. 저장 및 불러오기 기능 ---
 
 function loadData(inputName) {
     nickname = inputName;
@@ -55,9 +52,10 @@ function saveData() {
     localStorage.setItem(`hamsterData_${nickname}`, JSON.stringify(data));
 }
 
-// 레벨 구간별 이미지 설정
 function updateHamsterImage() {
-    if (level >= 40) {
+    if (level >= 50) {
+        hamster.src = "david_hamster.png";
+    } else if (level >= 40) {
         hamster.src = "maid_hamster.png";
     } else if (level >= 30) {
         hamster.src = "soldier_hamster.png";
@@ -158,11 +156,13 @@ function addLove() {
             if (level === 10) {
                 message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
             } else if (level === 20) {
-                message = "🎉 Lv.20 달성! 햄스터가 공룡으로 진화했습니다! 🚀";
+                message = "🎉 Lv.20 달성! 햄스터가 공룡햄으로 진화했습니다! 🚀";
             } else if (level === 30) {
                 message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
             } else if (level === 40) {
                 message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
+            } else if (level === 50) {
+                message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
             }
             
             alert(message);
