@@ -1,4 +1,3 @@
-// 🔥 Firebase 설정 정보
 const firebaseConfig = {
     apiKey: "AIzaSyBe9k_PBhDr7bxAngUetgFtBONGiXQQCEU",
     authDomain: "hamster-4ade3.firebaseapp.com",
@@ -41,6 +40,10 @@ const hamster = document.getElementById("hamster");
 const loveText = document.getElementById("love");
 const levelText = document.getElementById("level");
 
+const chatBox = document.getElementById("chat-box");
+const chatInput = document.getElementById("chat-input");
+const sendChatBtn = document.getElementById("send-chat-btn");
+
 function loadData(inputName, inputPw) {
     nickname = inputName;
     password = inputPw;
@@ -72,6 +75,7 @@ function loadData(inputName, inputPw) {
         gameScreen.classList.remove("hidden");
         
         saveData();
+        initChat();
     });
 }
 
@@ -132,6 +136,38 @@ function changeNickname() {
     });
 }
 
+function initChat() {
+    if (!chatBox) return;
+
+    database.ref("messages").limitToLast(50).on("child_added", (snapshot) => {
+        const msgData = snapshot.val();
+        displayMessage(msgData.sender, msgData.text);
+    });
+}
+
+function sendChatMessage() {
+    if (!chatInput) return;
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    database.ref("messages").push({
+        sender: nickname,
+        text: text,
+        timestamp: Date.now()
+    });
+
+    chatInput.value = "";
+}
+
+function displayMessage(sender, text) {
+    if (!chatBox) return;
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("chat-msg");
+    msgDiv.innerHTML = `<strong>[${sender}]</strong>: ${text}`;
+    chatBox.appendChild(msgDiv);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 function loadRanking() {
     rankList.innerHTML = "로딩 중...";
     database.ref("users").orderByChild("level").limitToLast(10).once("value", (snapshot) => {
@@ -230,6 +266,17 @@ rankBtn.addEventListener("click", () => {
 closeRankBtn.addEventListener("click", () => {
     rankModal.classList.add("hidden");
 });
+
+if (sendChatBtn) {
+    sendChatBtn.addEventListener("click", sendChatMessage);
+}
+if (chatInput) {
+    chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            sendChatMessage();
+        }
+    });
+}
 
 function startPetting(x, y) {
     petting = true;

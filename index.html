@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>햄스터 쓰다듬기</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK 로드 -->
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
@@ -33,6 +33,15 @@
         <button id="change-nick-btn">✏️ 닉네임 변경</button>
         <br>
         <button id="reset-btn">로그아웃 / 다른 계정 접속</button>
+
+        <div id="chat-container">
+            <h3>💬 실시간 집사 채팅방</h3>
+            <div id="chat-box"></div>
+            <div id="chat-input-box">
+                <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." maxlength="50">
+                <button id="send-chat-btn">전송</button>
+            </div>
+        </div>
     </div>
 
     <div id="rank-modal" class="modal hidden">

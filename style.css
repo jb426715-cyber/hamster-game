@@ -6,7 +6,6 @@ html, body {
     background: #ffe8c7;
     text-align: center;
     font-family: Arial, sans-serif;
-    overflow: hidden;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
@@ -35,7 +34,7 @@ h1 {
     text-align: center;
 }
 
-#start-btn, #reset-btn, #rank-btn, #close-rank-btn, #change-nick-btn {
+#start-btn, #reset-btn, #rank-btn, #close-rank-btn, #change-nick-btn, #send-chat-btn {
     font-size: 16px;
     font-weight: bold;
     color: #fff;
@@ -47,7 +46,7 @@ h1 {
     margin-top: 10px;
 }
 
-#start-btn:active, #reset-btn:active, #rank-btn:active, #change-nick-btn:active {
+#start-btn:active, #reset-btn:active, #rank-btn:active, #change-nick-btn:active, #send-chat-btn:active {
     background-color: #4a3315;
 }
 
@@ -78,126 +77,64 @@ h1 {
 p {
     font-size: 28px;
 }
-.modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
-.modal-content {
+#chat-container {
+    width: 320px;
+    max-width: 90vw;
+    margin: 30px auto 50px auto;
     background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    width: 280px;
-    max-height: 70vh;
-    overflow-y: auto;
     border: 3px solid #6b4a1f;
-}
-
-#rank-list {
-    text-align: left;
-    padding-left: 25px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
-
-#rank-list li {
-    margin-bottom: 8px;
-}
-
-.bounce {
-    animation: boing .18s;
-}
-
-@keyframes boing {
-    0% { transform: scale(1); }
-    35% { transform: scale(.92, 1.08); }
-    65% { transform: scale(1.08, .92); }
-    100% { transform: scale(1); }
-}html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background: #ffe8c7;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-h1 {
-    color: #6b4a1f;
-    margin-top: 20px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-#login-screen {
-    margin-top: 100px;
-}
-
-#nickname-input, #password-input {
-    font-size: 18px;
+    border-radius: 12px;
     padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#chat-container h3 {
+    margin: 5px 0 10px 0;
+    color: #6b4a1f;
+    font-size: 18px;
+}
+
+#chat-box {
+    height: 150px;
+    overflow-y: auto;
+    background: #fdf8f0;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    border: 2px solid #6b4a1f;
-    outline: none;
-    text-align: center;
-}
-
-#start-btn, #reset-btn, #rank-btn, #close-rank-btn, #change-nick-btn {
-    font-size: 16px;
-    font-weight: bold;
-    color: #fff;
-    background-color: #6b4a1f;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-#start-btn:active, #reset-btn:active, #rank-btn:active, #change-nick-btn:active {
-    background-color: #4a3315;
-}
-
-#rank-btn {
-    background-color: #d97706;
-}
-
-#change-nick-btn {
-    background-color: #2563eb;
-}
-
-#reset-btn {
+    padding: 8px;
+    text-align: left;
     font-size: 14px;
-    background-color: #a84242;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-#hamster {
-    width: 350px;
-    max-width: 80vw;  
-    height: auto;    
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
+.chat-msg {
+    line-height: 1.4;
+    word-break: break-all;
 }
 
-p {
-    font-size: 28px;
+.chat-msg strong {
+    color: #6b4a1f;
+}
+
+#chat-input-box {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+#send-chat-btn {
+    margin-top: 0;
+    padding: 8px 12px;
 }
 
 .modal {
