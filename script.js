@@ -1,3 +1,4 @@
+// 🔥 Firebase 설정 정보
 const firebaseConfig = {
     apiKey: "AIzaSyBe9k_PBhDr7bxAngUetgFtBONGiXQQCEU",
     authDomain: "hamster-4ade3.firebaseapp.com",
@@ -145,8 +146,8 @@ function loadRanking() {
 
         players.forEach((player) => {
             const li = document.createElement("li");
-            if (player.level >= 100) {
-                li.textContent = `${player.nickname} - Lv.100 (❤️${player.love})`;
+            if (player.level >= 110) {
+                li.textContent = `${player.nickname} - Lv.110 (❤️${player.love})`;
             } else {
                 li.textContent = `${player.nickname} - Lv.${player.level}`;
             }
@@ -156,24 +157,36 @@ function loadRanking() {
 }
 
 function updateHamsterImage() {
-    if (level >= 50) {
-        hamster.src = "david_hamster.png";
+    if (level >= 110) {
+        hamster.src = "hamster100.png";      // 110렙: 햄스터100
+    } else if (level >= 100) {
+        hamster.src = "golden_hamster.png";   // 100렙: 골든골든햄스터
+    } else if (level >= 90) {
+        hamster.src = "orchestra_hamster.png"; // 90렙: 오케스트라햄
+    } else if (level >= 80) {
+        hamster.src = "gangster_hamster.png";  // 80렙: 갱스터햄
+    } else if (level >= 70) {
+        hamster.src = "bikini_hamster.png";    // 70렙: 비키니햄
+    } else if (level >= 60) {
+        hamster.src = "otaku_hamster.png";     // 60렙: 오타쿠햄
+    } else if (level >= 50) {
+        hamster.src = "david_hamster.png";     // 50렙: 데이비드햄
     } else if (level >= 40) {
-        hamster.src = "maid_hamster.png";
+        hamster.src = "maid_hamster.png";      // 40렙: 메이드햄
     } else if (level >= 30) {
-        hamster.src = "soldier_hamster.png";
+        hamster.src = "soldier_hamster.png";   // 30렙: 군인햄
     } else if (level >= 20) {
-        hamster.src = "T_hamster.png";
+        hamster.src = "T_hamster.png";         // 20렙: T_hamster
     } else if (level >= 10) {
-        hamster.src = "gyaru_hamster.png";
+        hamster.src = "gyaru_hamster.png";     // 10렙: 갸루햄
     } else {
-        hamster.src = "hamster.png";
+        hamster.src = "hamster.png";           // 기본 햄스터
     }
 }
 
 function updateUI() {
     if (loveText) {
-        if (level >= 100) {
+        if (level >= 110) {
             loveText.textContent = `${love} (MAX!)`;
         } else {
             loveText.textContent = `${love} / ${maxLove}`;
@@ -181,6 +194,7 @@ function updateUI() {
     }
     if (levelText) levelText.textContent = level;
 }
+
 startBtn.addEventListener("click", () => {
     const inputVal = nicknameInput.value.trim();
     const pwVal = passwordInput.value.trim();
@@ -270,7 +284,7 @@ hamster.addEventListener("touchmove", (e) => {
 function addLove() {
     love++;
 
-    if (level < 100) {
+    if (level < 110) {
         if (love >= maxLove) {
             level++;
             love = 0;
@@ -278,15 +292,20 @@ function addLove() {
 
             updateHamsterImage();
 
-            if (level === 100) {
-                alert("👑 축하합니다! 최고 레벨인 Lv.100에 도달하셨습니다!\n이제부터 행복도는 한도 없이 끝없이 상승합니다! ✨");
+            if (level === 110) {
+                alert("👑 최종 신화 달성! Lv.110 (햄스터100)에 도달하셨습니다!\n이제부터 행복도는 한도 없이 무제한으로 증가합니다! ✨");
             } else if (level % 10 === 0) {
                 let message = "🎉 대박! Lv." + level + " 달성!";
                 if (level === 10) message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
-                else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡로 진화했습니다! 🚀";
+                else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡으로 진화했습니다! 🚀";
                 else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
                 else if (level === 40) message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
                 else if (level === 50) message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
+                else if (level === 60) message = "🎉 Lv.60 달성! 햄스터가 오타쿠햄으로 변신했습니다! 🤓";
+                else if (level === 70) message = "🎉 Lv.70 달성! 햄스터가 비키니햄으로 변신했습니다! 👙";
+                else if (level === 80) message = "🎉 Lv.80 달성! 햄스터가 갱스터햄으로 변신했습니다! 😎";
+                else if (level === 90) message = "🎉 Lv.90 달성! 햄스터가 오케스트라햄으로 변신했습니다! 🎻";
+                else if (level === 100) message = "🎉 Lv.100 달성! 햄스터가 영롱한 골든골든햄스터로 진화했습니다! 🌟";
                 alert(message);
             }
         }
