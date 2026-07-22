@@ -87,7 +87,7 @@ function addLove() {
             if (level === 10) {
                 message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
             } else if (level === 20) {
-                message = "🎉 Lv.20 달성! 햄스터가 T_hamster로 진화했습니다! 🚀";
+                message = "🎉 Lv.20 달성! 햄스터가 공룡햄으로 진화했습니다! 🚀";
             }
             
             alert(message);
