@@ -74,14 +74,23 @@ function addLove() {
 
         if (levelText) levelText.textContent = level;
 
-        // 🔥 10레벨 단위(10, 20, 30...)마다만 팝업 실행
+        if (level === 10) {
+            hamster.src = "gyaru_hamster.png";
+        } else if (level === 20) {
+            hamster.src = "T_hamster.png";
+        }
+
+        // 2. 10레벨 단위 팝업 알림
         if (level % 10 === 0) {
+            let message = "🎉 대박! Lv." + level + " 달성!";
+            
             if (level === 10) {
-                hamster.src = "gyaru_hamster.png"; // 10레벨 달성 시 갸루 변신
-                alert("🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨");
-            } else {
-                alert("🎉 대박! Lv." + level + " 달성!");
+                message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
+            } else if (level === 20) {
+                message = "🎉 Lv.20 달성! 햄스터가 T_hamster로 진화했습니다! 🚀";
             }
+            
+            alert(message);
         }
     }
 
