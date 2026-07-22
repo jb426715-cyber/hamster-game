@@ -6,10 +6,8 @@ html, body {
     background: #ffe8c7;
     text-align: center;
     font-family: Arial, sans-serif;
-    
     overflow: hidden;
     touch-action: manipulation;
-    
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -37,7 +35,7 @@ h1 {
     text-align: center;
 }
 
-#start-btn, #reset-btn {
+#start-btn, #reset-btn, #rank-btn, #close-rank-btn {
     font-size: 16px;
     font-weight: bold;
     color: #fff;
@@ -49,14 +47,18 @@ h1 {
     margin-top: 10px;
 }
 
-#start-btn:active, #reset-btn:active {
+#start-btn:active, #reset-btn:active, #rank-btn:active {
     background-color: #4a3315;
+}
+
+#rank-btn {
+    background-color: #d97706;
 }
 
 #reset-btn {
     font-size: 14px;
     background-color: #a84242;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 #hamster {
@@ -66,12 +68,43 @@ h1 {
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    
     touch-action: manipulation;
 }
 
 p {
     font-size: 28px;
+}
+
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 280px;
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 3px solid #6b4a1f;
+}
+
+#rank-list {
+    text-align: left;
+    padding-left: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+#rank-list li {
+    margin-bottom: 8px;
 }
 
 .bounce {

@@ -1,3 +1,17 @@
+const firebaseConfig = {
+    apiKey: "AIzaSyBe9k_PBhDr7bxAngUetgFtBONGiXQQCEU",
+    authDomain: "hamster-4ade3.firebaseapp.com",
+    databaseURL: "https://hamster-4ade3-default-rtdb.firebaseio.com",
+    projectId: "hamster-4ade3",
+    storageBucket: "hamster-4ade3.firebasestorage.app",
+    messagingSenderId: "655738496764",
+    appId: "1:655738496764:web:e3sdfd2c61dd454a019979",
+    measurementId: "G-TH75123TVD"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 let nickname = "";
 let love = 0;
 let level = 1;
@@ -13,6 +27,10 @@ const gameScreen = document.getElementById("game-screen");
 const nicknameInput = document.getElementById("nickname-input");
 const startBtn = document.getElementById("start-btn");
 const resetBtn = document.getElementById("reset-btn");
+const rankBtn = document.getElementById("rank-btn");
+const closeRankBtn = document.getElementById("close-rank-btn");
+const rankModal = document.getElementById("rank-modal");
+const rankList = document.getElementById("rank-list");
 const playerNameText = document.getElementById("player-name");
 
 const hamster = document.getElementById("hamster");
@@ -21,37 +39,59 @@ const levelText = document.getElementById("level");
 
 function loadData(inputName) {
     nickname = inputName;
-    const saveData = localStorage.getItem(`hamsterData_${nickname}`);
+    
+    database.ref("users/" + nickname).once("value").then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            level = data.level || 1;
+            love = data.love || 0;
+            maxLove = data.maxLove || 100;
+        } else {
+            level = 1;
+            love = 0;
+            maxLove = 100;
+        }
 
-    if (saveData) {
-        const parsed = JSON.parse(saveData);
-        level = parsed.level || 1;
-        love = parsed.love || 0;
-        maxLove = parsed.maxLove || 100;
-    } else {
-        level = 1;
-        love = 0;
-        maxLove = 100;
-    }
+        playerNameText.textContent = nickname;
+        updateUI();
+        updateHamsterImage();
 
-    playerNameText.textContent = nickname;
-    updateUI();
-    updateHamsterImage();
-
-    loginScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
+        loginScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+    });
 }
 
 function saveData() {
     if (!nickname) return;
-    const data = {
+
+    database.ref("users/" + nickname).set({
+        nickname: nickname,
         level: level,
         love: love,
         maxLove: maxLove
-    };
-    localStorage.setItem(`hamsterData_${nickname}`, JSON.stringify(data));
+    });
 }
 
+function loadRanking() {
+    rankList.innerHTML = "로딩 중...";
+    database.ref("users").orderByChild("level").limitToLast(10).once("value", (snapshot) => {
+        rankList.innerHTML = "";
+        const players = [];
+
+        snapshot.forEach((child) => {
+            players.push(child.val());
+        });
+
+
+        players.reverse();
+
+        players.forEach((player) => {
+            const li = document.createElement("li");
+            li.textContent = `${player.nickname} - Lv.${player.level}`;
+            rankList.appendChild(li);
+        });
+    });
+}
 function updateHamsterImage() {
     if (level >= 50) {
         hamster.src = "david_hamster.png";
@@ -88,6 +128,15 @@ resetBtn.addEventListener("click", () => {
         gameScreen.classList.add("hidden");
         nicknameInput.value = "";
     }
+});
+
+rankBtn.addEventListener("click", () => {
+    rankModal.classList.remove("hidden");
+    loadRanking();
+});
+
+closeRankBtn.addEventListener("click", () => {
+    rankModal.classList.add("hidden");
 });
 
 function startPetting(x, y) {
@@ -152,19 +201,11 @@ function addLove() {
 
         if (level % 10 === 0) {
             let message = "🎉 대박! Lv." + level + " 달성!";
-            
-            if (level === 10) {
-                message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
-            } else if (level === 20) {
-                message = "🎉 Lv.20 달성! 햄스터가 공룡햄으로 진화했습니다! 🚀";
-            } else if (level === 30) {
-                message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
-            } else if (level === 40) {
-                message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
-            } else if (level === 50) {
-                message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
-            }
-            
+            if (level === 10) message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
+            else if (level === 20) message = "🎉 Lv.20 달성! 햄스터가 공룡으로 진화했습니다! 🚀";
+            else if (level === 30) message = "🎉 Lv.30 달성! 햄스터가 군대로 입대했습니다! 🫡";
+            else if (level === 40) message = "🎉 Lv.40 달성! 햄스터가 메이드햄으로 변신했습니다! 🧹";
+            else if (level === 50) message = "🎉 Lv.50 달성! 햄스터가 데이비드햄으로 변신했습니다! 🗿";
             alert(message);
         }
     }

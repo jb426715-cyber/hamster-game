@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>햄스터 쓰다듬기</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -22,7 +24,17 @@
         <p>❤️ 행복도 : <span id="love"></span></p>
         <p>⭐ 레벨 : <span id="level">1</span></p>
 
+        <button id="rank-btn">🏆 실시간 랭킹 보기</button>
+        <br>
         <button id="reset-btn">데이터 초기화 / 닉네임 변경</button>
+    </div>
+    
+    <div id="rank-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🏆 햄스터 명예의 전당 Top 10</h2>
+            <ol id="rank-list"></ol>
+            <button id="close-rank-btn">닫기</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
