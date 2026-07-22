@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>햄스터 쓰다듬기</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK 로드 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
@@ -11,9 +12,12 @@
 
     <div id="login-screen">
         <h1>🐹 햄스터 키우기</h1>
-        <p>집사의 닉네임을 입력하세요!</p>
+        <p>집사의 닉네임과 비밀번호를 입력하세요!</p>
         <input type="text" id="nickname-input" placeholder="닉네임 입력" maxlength="10">
-        <button id="start-btn">시작하기</button>
+        <br><br>
+        <input type="password" id="password-input" placeholder="비밀번호 입력" maxlength="15">
+        <br><br>
+        <button id="start-btn">시작하기 / 로그인</button>
     </div>
 
     <div id="game-screen" class="hidden">
@@ -26,9 +30,11 @@
 
         <button id="rank-btn">🏆 실시간 랭킹 보기</button>
         <br>
-        <button id="reset-btn">데이터 초기화 / 닉네임 변경</button>
+        <button id="change-nick-btn">✏️ 닉네임 변경</button>
+        <br>
+        <button id="reset-btn">로그아웃 / 다른 계정 접속</button>
     </div>
-    
+
     <div id="rank-modal" class="modal hidden">
         <div class="modal-content">
             <h2>🏆 햄스터 명예의 전당 Top 10</h2>
