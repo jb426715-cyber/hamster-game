@@ -7,14 +7,25 @@
 </head>
 <body>
 
-<h1>🐹 햄스터를 쓰다듬어 주세요!</h1>
+    <div id="login-screen">
+        <h1>🐹 햄스터 키우기</h1>
+        <p>집사의 닉네임을 입력하세요!</p>
+        <input type="text" id="nickname-input" placeholder="닉네임 입력" maxlength="10">
+        <button id="start-btn">시작하기</button>
+    </div>
 
-<img id="hamster" src="hamster.png" alt="햄스터">
+    <div id="game-screen" class="hidden">
+        <h1>🐹 <span id="player-name"></span>님의 햄스터!</h1>
 
-<p>❤️ 행복도 : <span id="love"></span></p>
-<p>⭐ 레벨 : <span id="level">1</span></p>
+        <img id="hamster" src="hamster.png" alt="햄스터">
 
-<script src="script.js"></script>
+        <p>❤️ 행복도 : <span id="love"></span></p>
+        <p>⭐ 레벨 : <span id="level">1</span></p>
+
+        <button id="reset-btn">데이터 초기화 / 닉네임 변경</button>
+    </div>
+
+    <script src="script.js"></script>
 
 </body>
 </html>

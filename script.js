@@ -1,3 +1,4 @@
+let nickname = "";
 let love = 0;
 let level = 1;
 let maxLove = 100;
@@ -7,12 +8,83 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
+const loginScreen = document.getElementById("login-screen");
+const gameScreen = document.getElementById("game-screen");
+const nicknameInput = document.getElementById("nickname-input");
+const startBtn = document.getElementById("start-btn");
+const resetBtn = document.getElementById("reset-btn");
+const playerNameText = document.getElementById("player-name");
+
 const hamster = document.getElementById("hamster");
 const loveText = document.getElementById("love");
 const levelText = document.getElementById("level");
 
-if (loveText) loveText.textContent = `${love} / ${maxLove}`;
-if (levelText) levelText.textContent = level;
+
+function loadData(inputName) {
+    nickname = inputName;
+    const saveData = localStorage.getItem(`hamsterData_${nickname}`);
+
+    if (saveData) {
+        const parsed = JSON.parse(saveData);
+        level = parsed.level || 1;
+        love = parsed.love || 0;
+        maxLove = parsed.maxLove || 100;
+    } else {
+
+        level = 1;
+        love = 0;
+        maxLove = 100;
+    }
+
+    playerNameText.textContent = nickname;
+    updateUI();
+    updateHamsterImage();
+
+    loginScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+}
+
+function saveData() {
+    if (!nickname) return;
+    const data = {
+        level: level,
+        love: love,
+        maxLove: maxLove
+    };
+    localStorage.setItem(`hamsterData_${nickname}`, JSON.stringify(data));
+}
+
+function updateHamsterImage() {
+    if (level >= 20) {
+        hamster.src = "T_hamster.png";
+    } else if (level >= 10) {
+        hamster.src = "gyaru_hamster.png";
+    } else {
+        hamster.src = "hamster.png";
+    }
+}
+
+function updateUI() {
+    if (loveText) loveText.textContent = `${love} / ${maxLove}`;
+    if (levelText) levelText.textContent = level;
+}
+
+startBtn.addEventListener("click", () => {
+    const inputVal = nicknameInput.value.trim();
+    if (!inputVal) {
+        alert("닉네임을 입력해 주세요!");
+        return;
+    }
+    loadData(inputVal);
+});
+
+resetBtn.addEventListener("click", () => {
+    if (confirm("정말 로그아웃하고 다른 닉네임으로 접속하시겠습니까?")) {
+        loginScreen.classList.remove("hidden");
+        gameScreen.classList.add("hidden");
+        nicknameInput.value = "";
+    }
+});
 
 function startPetting(x, y) {
     petting = true;
@@ -72,29 +144,21 @@ function addLove() {
         love = 0;
         maxLove += 20;
 
-        if (levelText) levelText.textContent = level;
+        updateHamsterImage();
 
-        if (level === 10) {
-            hamster.src = "gyaru_hamster.png";
-        } else if (level === 20) {
-            hamster.src = "T_hamster.png";
-        }
-
-        // 2. 10레벨 단위 팝업 알림
         if (level % 10 === 0) {
             let message = "🎉 대박! Lv." + level + " 달성!";
-            
             if (level === 10) {
                 message = "🎉 Lv.10 달성! 햄스터가 갸루로 변신했습니다! ✨";
             } else if (level === 20) {
-                message = "🎉 Lv.20 달성! 햄스터가 공룡햄으로 진화했습니다! 🚀";
+                message = "🎉 Lv.20 달성! 햄스터가 T_hamster로 진화했습니다! 🚀";
             }
-            
             alert(message);
         }
     }
 
-    if (loveText) loveText.textContent = `${love} / ${maxLove}`;
+    updateUI();
+    saveData();
 
     hamster.classList.remove("bounce");
     void hamster.offsetWidth;
