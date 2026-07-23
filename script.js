@@ -25,9 +25,9 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
-// 🛑 오토클릭 방지용 변수
+// 🛑 적당히 신나게 클릭되는 60ms 제한 (초당 최대 16회)
 let lastClickTime = 0;
-const MIN_CLICK_INTERVAL = 100; // 100ms 간격 제한 (초당 최대 10회)
+const MIN_CLICK_INTERVAL = 60; 
 
 let samePointCount = 0;
 let lastRecordedX = -1;
@@ -104,7 +104,6 @@ function loadData(inputName, inputPw) {
             level = parseInt(data.level, 10) || 1;
             love = parseInt(data.love, 10) || 0;
             maxLove = parseInt(data.maxLove, 10) || 100;
-            // 💡 DB에 저장되어 있는 해씨 갯수를 그대로 정확히 불러옵니다. (초기화 문제 해결)
             seeds = data.seeds !== undefined ? parseInt(data.seeds, 10) : 0;
             lastMaxLoveReward = parseInt(data.lastMaxLoveReward, 10) || 0;
         } else {
@@ -221,7 +220,6 @@ if (useBoostBtn) {
             return;
         }
 
-        // 💡 부스터 사용 시 1개 차감 후 DB에 즉시 영구 저장
         seeds -= 1;
         isBoostActive = true;
         boostTimeLeft = 10;
@@ -355,7 +353,6 @@ if (chatInput) {
     });
 }
 
-// 🛑 오토클릭 방지 로직
 function startPetting(x, y) {
     const now = Date.now();
 
@@ -365,7 +362,7 @@ function startPetting(x, y) {
 
     if (x === lastRecordedX && y === lastRecordedY) {
         samePointCount++;
-        if (samePointCount > 10) {
+        if (samePointCount > 15) {
             return;
         }
     } else {
@@ -397,7 +394,8 @@ function movePetting(x, y) {
 
     petDistance += distance;
 
-    if (petDistance >= 50) {
+    // ⚖️ 40px 정도 확실히 끌어서 비벼야 1번 카운트
+    if (petDistance >= 40) { 
         petDistance = 0;
         lastClickTime = now;
         addLove();
@@ -437,7 +435,9 @@ hamster.addEventListener("touchmove", (e) => {
 }, { passive: false });
 
 function addLove() {
+    // ⚖️ 기본 획득량은 깔끔하게 1 고정 (부스터 사용 시 2)
     const amount = isBoostActive ? 2 : 1;
+    
     love += amount;
 
     if (level >= 110) {
