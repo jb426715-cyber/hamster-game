@@ -51,7 +51,7 @@ const playerNameText = document.getElementById("player-name");
 const hamster = document.getElementById("hamster");
 const loveText = document.getElementById("love");
 const levelText = document.getElementById("level");
-const seedsText = document.getElementById("seeds"); // 해씨 요소 추가
+const seedsText = document.getElementById("seeds");
 
 const chatBox = document.getElementById("chat-box");
 const chatInput = document.getElementById("chat-input");
@@ -106,7 +106,6 @@ function loadData(inputName, inputPw) {
             seeds = parseInt(data.seeds, 10) || 0;
             lastMaxLoveReward = parseInt(data.lastMaxLoveReward, 10) || 0;
 
-            // 기존 저장 데이터에 해씨 계산이 누락되어 있던 경우 수동으로 보정 (10레벨당 1개)
             const expectedSeedsFromLevel = Math.floor(level / 10);
             if (level < 110 && seeds < expectedSeedsFromLevel) {
                 seeds = expectedSeedsFromLevel;
@@ -370,7 +369,7 @@ function updateUI() {
         }
     }
     if (levelText) levelText.textContent = level;
-    if (seedsText) seedsText.textContent = seeds; // UI 업데이트 추가
+    if (seedsText) seedsText.textContent = seeds;
 }
 
 startBtn.addEventListener("click", () => {
@@ -465,12 +464,13 @@ function addLove() {
     love += amount;
 
     if (level >= 110) {
-        const currentRewardLevel = Math.floor(love / 10000);
+        // 만렙 달성 이후 행복도 25,000당 해바라기씨 1개 지급
+        const currentRewardLevel = Math.floor(love / 25000);
         if (currentRewardLevel > lastMaxLoveReward) {
             const gainedSeeds = currentRewardLevel - lastMaxLoveReward;
             seeds += gainedSeeds;
             lastMaxLoveReward = currentRewardLevel;
-            sendLocalPushNotification("🌻 해바라기씨 획득!", `행복도 10,000 달성으로 해씨 ${gainedSeeds}개를 받았습니다!`);
+            sendLocalPushNotification("🌻 해바라기씨 획득!", `행복도 25,000 달성으로 해씨 ${gainedSeeds}개를 받았습니다!`);
         }
     } else {
         if (love >= maxLove) {
