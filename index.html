@@ -11,7 +11,6 @@
 </head>
 <body>
 
-    <!-- 로그인 화면 -->
     <div id="login-screen">
         <h1>🐹 햄스터 키우기</h1>
         <p>집사의 닉네임과 비밀번호를 입력하세요!</p>
@@ -22,16 +21,14 @@
         <button id="start-btn">시작하기 / 로그인</button>
     </div>
 
-    <!-- 게임 화면 -->
     <div id="game-screen" class="hidden">
         <h1>🐹 <span id="player-name"></span>님의 햄스터!</h1>
 
-        <!-- 부스터 & 자동 영역 -->
         <div id="boost-container">
             <div class="boost-info">
-                ※ 해바라기씨 획득: 10레벨마다 1개 (Lv.110 이후 행복도 25,000당 1개)
+                ※ 해바라기씨 획득: 10레벨마다 1개 (Lv.110 이후 행복도 10,000당 1개)
             </div>
-            
+
             <p style="margin: 6px 0; font-size: 0.85em; color: #555; font-weight: bold;">
                 🌻 보유 해바라기씨 : <span id="seeds">0</span>개
             </p>
@@ -55,7 +52,6 @@
         <br>
         <button id="reset-btn">로그아웃 / 다른 계정 접속</button>
 
-        <!-- 실시간 채팅 -->
         <div id="chat-container">
             <h3>💬 실시간 집사 채팅방</h3>
             <div id="chat-box"></div>
@@ -66,7 +62,6 @@
         </div>
     </div>
 
-    <!-- 랭킹 모달 -->
     <div id="rank-modal" class="modal hidden">
         <div class="modal-content">
             <h2>🏆 햄스터 명예의 전당 Top 10</h2>
