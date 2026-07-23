@@ -104,13 +104,9 @@ function loadData(inputName, inputPw) {
             level = parseInt(data.level, 10) || 1;
             love = parseInt(data.love, 10) || 0;
             maxLove = parseInt(data.maxLove, 10) || 100;
-            seeds = parseInt(data.seeds, 10) || 0;
+            // 💡 DB에 저장되어 있는 해씨 갯수를 그대로 정확히 불러옵니다. (초기화 문제 해결)
+            seeds = data.seeds !== undefined ? parseInt(data.seeds, 10) : 0;
             lastMaxLoveReward = parseInt(data.lastMaxLoveReward, 10) || 0;
-
-            const expectedSeedsFromLevel = Math.floor(level / 10);
-            if (level < 110 && seeds < expectedSeedsFromLevel) {
-                seeds = expectedSeedsFromLevel;
-            }
         } else {
             level = 1;
             love = 0;
@@ -225,6 +221,7 @@ if (useBoostBtn) {
             return;
         }
 
+        // 💡 부스터 사용 시 1개 차감 후 DB에 즉시 영구 저장
         seeds -= 1;
         isBoostActive = true;
         boostTimeLeft = 10;
@@ -362,12 +359,10 @@ if (chatInput) {
 function startPetting(x, y) {
     const now = Date.now();
 
-    // 1. 100ms 이내의 연속 입력 차단 (초당 최대 10회 제한)
     if (now - lastClickTime < MIN_CLICK_INTERVAL) {
         return;
     }
 
-    // 2. 정확히 같은 좌표만 계속 누르는 오토클릭 차단
     if (x === lastRecordedX && y === lastRecordedY) {
         samePointCount++;
         if (samePointCount > 10) {
