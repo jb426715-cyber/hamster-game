@@ -21,11 +21,7 @@ let seeds = 0;
 let lastMaxLoveReward = 0; 
 
 let petting = false;
-let lastX = 0;
-let lastY = 0;
-let petDistance = 0;
 
-// 🛑 적당히 신나게 클릭되는 60ms 제한 (초당 최대 16회)
 let lastClickTime = 0;
 const MIN_CLICK_INTERVAL = 60; 
 
@@ -353,7 +349,9 @@ if (chatInput) {
     });
 }
 
-function startPetting(x, y) {
+const activeTouches = {};
+
+function processTouchStart(id, x, y) {
     const now = Date.now();
 
     if (now - lastClickTime < MIN_CLICK_INTERVAL) {
@@ -362,9 +360,7 @@ function startPetting(x, y) {
 
     if (x === lastRecordedX && y === lastRecordedY) {
         samePointCount++;
-        if (samePointCount > 15) {
-            return;
-        }
+        if (samePointCount > 15) return;
     } else {
         samePointCount = 0;
     }
@@ -373,71 +369,93 @@ function startPetting(x, y) {
     lastRecordedX = x;
     lastRecordedY = y;
 
-    petting = true;
-    lastX = x;
-    lastY = y;
-    petDistance = 0;
+    activeTouches[id] = {
+        lastX: x,
+        lastY: y,
+        distance: 0
+    };
+
     addLove();
 }
 
-function movePetting(x, y) {
-    if (!petting) return;
+function processTouchMove(id, x, y) {
+    const touchState = activeTouches[id];
+    if (!touchState) return;
 
     const now = Date.now();
     if (now - lastClickTime < MIN_CLICK_INTERVAL) {
         return;
     }
 
-    const dx = x - lastX;
-    const dy = y - lastY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const dx = x - touchState.lastX;
+    const dy = y - touchState.lastY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
 
-    petDistance += distance;
+    touchState.distance += dist;
 
-    // ⚖️ 40px 정도 확실히 끌어서 비벼야 1번 카운트
-    if (petDistance >= 40) { 
-        petDistance = 0;
+    if (touchState.distance >= 40) {
+        touchState.distance = 0;
         lastClickTime = now;
         addLove();
     }
 
-    lastX = x;
-    lastY = y;
+    touchState.lastX = x;
+    touchState.lastY = y;
 }
 
-function stopPetting() {
-    petting = false;
+function processTouchEnd(id) {
+    delete activeTouches[id];
 }
 
-// 마우스 / 터치 이벤트
 hamster.addEventListener("mousedown", (e) => {
     if (!e.isTrusted) return;
-    startPetting(e.clientX, e.clientY);
+    petting = true;
+    processTouchStart("mouse", e.clientX, e.clientY);
 });
-document.addEventListener("mouseup", stopPetting);
-hamster.addEventListener("mousemove", (e) => movePetting(e.clientX, e.clientY));
+
+document.addEventListener("mouseup", () => {
+    petting = false;
+    processTouchEnd("mouse");
+});
+
+hamster.addEventListener("mousemove", (e) => {
+    if (!petting) return;
+    processTouchMove("mouse", e.clientX, e.clientY);
+});
 
 hamster.addEventListener("touchstart", (e) => {
     if (!e.isTrusted) return;
     e.preventDefault();
-    const touch = e.touches[0];
-    startPetting(touch.clientX, touch.clientY);
-}, { passive: false });
 
-document.addEventListener("touchend", stopPetting);
-document.addEventListener("touchcancel", stopPetting);
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        processTouchStart(t.identifier, t.clientX, t.clientY);
+    }
+}, { passive: false });
 
 hamster.addEventListener("touchmove", (e) => {
     e.preventDefault();
-    if (!petting) return;
-    const touch = e.touches[0];
-    movePetting(touch.clientX, touch.clientY);
+
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        processTouchMove(t.identifier, t.clientX, t.clientY);
+    }
 }, { passive: false });
 
+document.addEventListener("touchend", (e) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        processTouchEnd(e.changedTouches[i].identifier);
+    }
+});
+
+document.addEventListener("touchcancel", (e) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        processTouchEnd(e.changedTouches[i].identifier);
+    }
+});
+
 function addLove() {
-    // ⚖️ 기본 획득량은 깔끔하게 1 고정 (부스터 사용 시 2)
     const amount = isBoostActive ? 2 : 1;
-    
     love += amount;
 
     if (level >= 110) {
