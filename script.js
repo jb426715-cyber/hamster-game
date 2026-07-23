@@ -25,7 +25,7 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
-// 🛑 강화된 오토클릭 방지용 변수
+// 🛑 오토클릭 방지용 변수
 let lastClickTime = 0;
 const MIN_CLICK_INTERVAL = 100; // 100ms 간격 제한 (초당 최대 10회)
 
@@ -36,14 +36,6 @@ let lastRecordedY = -1;
 let isBoostActive = false;
 let boostTimeLeft = 0;
 let boostTimer = null;
-
-// 🤖 자동 쓰다듬기 시간 유지 변수
-let lastAutoTime = 0; // 마지막으로 자동 쓰다듬기가 실행된 시각 (타임스탬프)
-let autoCooldownLeft = 0;
-let isAutoActive = false;
-let autoTimeLeft = 0;
-let autoInterval = null;
-let autoCooldownTimer = null;
 
 const loginScreen = document.getElementById("login-screen");
 const gameScreen = document.getElementById("game-screen");
@@ -69,7 +61,6 @@ const sendChatBtn = document.getElementById("send-chat-btn");
 
 const useBoostBtn = document.getElementById("use-boost-btn");
 const boostStatusText = document.getElementById("boost-status");
-const autoStatusText = document.getElementById("auto-status");
 
 function requestNotificationPermission() {
     if ("Notification" in window && "serviceWorker" in navigator) {
@@ -115,7 +106,6 @@ function loadData(inputName, inputPw) {
             maxLove = parseInt(data.maxLove, 10) || 100;
             seeds = parseInt(data.seeds, 10) || 0;
             lastMaxLoveReward = parseInt(data.lastMaxLoveReward, 10) || 0;
-            lastAutoTime = parseInt(data.lastAutoTime, 10) || 0; // 불러오기 추가
 
             const expectedSeedsFromLevel = Math.floor(level / 10);
             if (level < 110 && seeds < expectedSeedsFromLevel) {
@@ -127,7 +117,6 @@ function loadData(inputName, inputPw) {
             maxLove = 100;
             seeds = 0;
             lastMaxLoveReward = 0;
-            lastAutoTime = 0;
             alert("✨ 신규 계정이 등록되었습니다!");
         }
 
@@ -141,7 +130,6 @@ function loadData(inputName, inputPw) {
         saveData();
         initChat();
         requestNotificationPermission();
-        startAutoSystem();
     });
 }
 
@@ -155,8 +143,7 @@ function saveData() {
         love: love,
         maxLove: maxLove,
         seeds: seeds,
-        lastMaxLoveReward: lastMaxLoveReward,
-        lastAutoTime: lastAutoTime // 저장 추가
+        lastMaxLoveReward: lastMaxLoveReward
     });
 }
 
@@ -266,65 +253,6 @@ if (useBoostBtn) {
     });
 }
 
-// 🤖 타임스탬프 기반 자동 쓰다듬기 시스템
-function startAutoSystem() {
-    if (autoCooldownTimer) clearInterval(autoCooldownTimer);
-
-    autoCooldownTimer = setInterval(() => {
-        if (!isAutoActive) {
-            const now = Date.now();
-            const COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3시간 (밀리초)
-            const elapsedTime = now - lastAutoTime;
-
-            if (elapsedTime >= COOLDOWN_MS) {
-                autoCooldownLeft = 0;
-                triggerAutoPetting();
-            } else {
-                autoCooldownLeft = Math.ceil((COOLDOWN_MS - elapsedTime) / 1000);
-
-                if (autoStatusText) {
-                    const hours = Math.floor(autoCooldownLeft / 3600);
-                    const mins = Math.floor((autoCooldownLeft % 3600) / 60);
-                    const secs = autoCooldownLeft % 60;
-                    autoStatusText.textContent = `🤖 자동 쓰다듬기 대기 중 (${hours}시간 ${mins}분 ${secs}초 남음)`;
-                }
-            }
-        }
-    }, 1000);
-}
-
-function triggerAutoPetting() {
-    isAutoActive = true;
-    autoTimeLeft = 300; // 5분 (300초)
-    lastAutoTime = Date.now(); // 실행 시점 기록
-    saveData(); // DB에 시각 즉시 저장
-
-    sendLocalPushNotification("🤖 자동 클릭 작동!", "5분간 자동으로 햄스터를 쓰다듬습니다!");
-
-    if (autoInterval) clearInterval(autoInterval);
-
-    autoInterval = setInterval(() => {
-        addLove();
-    }, 200);
-
-    const autoActiveTimer = setInterval(() => {
-        autoTimeLeft--;
-        if (autoStatusText) {
-            const mins = Math.floor(autoTimeLeft / 60);
-            const secs = autoTimeLeft % 60;
-            autoStatusText.textContent = `⚡ 자동 쓰다듬기 가동 중! (${mins}분 ${secs}초 남음)`;
-        }
-
-        if (autoTimeLeft <= 0) {
-            clearInterval(autoInterval);
-            clearInterval(autoActiveTimer);
-            isAutoActive = false;
-            if (autoStatusText) autoStatusText.textContent = "";
-            alert("🤖 5분간의 자동 쓰다듬기가 종료되었습니다!");
-        }
-    }, 1000);
-}
-
 function loadRanking() {
     rankList.innerHTML = "로딩 중...";
     database.ref("users").once("value").then((snapshot) => {
@@ -430,7 +358,7 @@ if (chatInput) {
     });
 }
 
-// 🛑 강화된 오토클릭 방지 로직
+// 🛑 오토클릭 방지 로직
 function startPetting(x, y) {
     const now = Date.now();
 
