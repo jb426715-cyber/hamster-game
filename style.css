@@ -34,7 +34,7 @@ h1 {
     text-align: center;
 }
 
-#start-btn, #reset-btn, #rank-btn, #close-rank-btn, #change-nick-btn, #send-chat-btn {
+#start-btn, #reset-btn, #rank-btn, #close-rank-btn, #change-nick-btn, #send-chat-btn, #inventory-btn, #close-inventory-btn {
     font-size: 16px;
     font-weight: bold;
     color: #fff;
@@ -46,8 +46,12 @@ h1 {
     margin-top: 10px;
 }
 
-#start-btn:active, #reset-btn:active, #rank-btn:active, #change-nick-btn:active, #send-chat-btn:active {
+#start-btn:active, #reset-btn:active, #rank-btn:active, #change-nick-btn:active, #send-chat-btn:active, #inventory-btn:active {
     background-color: #4a3315;
+}
+
+#inventory-btn {
+    background-color: #059669;
 }
 
 #rank-btn {
@@ -64,6 +68,43 @@ h1 {
     margin-top: 10px;
 }
 
+#boost-container {
+    margin: 15px auto;
+    padding: 12px;
+    border: 1px solid #ffd166;
+    border-radius: 10px;
+    background: #fff8e7;
+    max-width: 350px;
+}
+
+.boost-info {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+#use-boost-btn {
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #ffb703;
+    border: none;
+    border-radius: 6px;
+    color: white;
+}
+
+#boost-status {
+    margin-top: 8px;
+    font-weight: bold;
+    color: #ff6b6b;
+}
+
+#auto-status {
+    margin-top: 4px;
+    color: #4ecdc4;
+    font-weight: bold;
+}
+
 #hamster {
     width: 350px;
     max-width: 80vw;  
@@ -76,6 +117,7 @@ h1 {
 
 p {
     font-size: 28px;
+    margin: 10px 0;
 }
 
 #chat-container {
@@ -145,6 +187,7 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {

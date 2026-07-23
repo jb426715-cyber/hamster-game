@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>햄스터 쓰다듬기</title>
     <link rel="stylesheet" href="style.css">
     
@@ -23,9 +24,26 @@
     <div id="game-screen" class="hidden">
         <h1>🐹 <span id="player-name"></span>님의 햄스터!</h1>
 
+        <div id="boost-container">
+            <div class="boost-info">
+                ※ 해바라기씨 획득: 10레벨마다 1개 (Lv.110 이후 행복도 10,000당 1개)
+            </div>
+
+            <p style="margin: 6px 0; font-size: 0.85em; color: #555; font-weight: bold;">
+                🌻 보유 해바라기씨 : <span id="seeds">0</span>개
+            </p>
+
+            <button id="use-boost-btn">
+                🔥 2배 피버 타임 (10초간)
+            </button>
+
+            <div id="boost-status"></div>
+            <div id="auto-status"></div>
+        </div>
+
         <img id="hamster" src="hamster.png" alt="햄스터">
 
-        <p>❤️ 행복도 : <span id="love"></span></p>
+        <p>❤️ 행복도 : <span id="love">0</span></p>
         <p>⭐ 레벨 : <span id="level">1</span></p>
 
         <button id="rank-btn">🏆 실시간 랭킹 보기</button>
