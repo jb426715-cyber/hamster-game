@@ -21,7 +21,9 @@ let seeds = 0;
 let lastMaxLoveReward = 0; 
 
 let petting = false;
-const MIN_CLICK_INTERVAL = 40; 
+
+let lastClickTime = 0;
+const MIN_CLICK_INTERVAL = 60; 
 
 let samePointCount = 0;
 let lastRecordedX = -1;
@@ -352,19 +354,26 @@ const activeTouches = {};
 function processTouchStart(id, x, y) {
     const now = Date.now();
 
-    if (!activeTouches[id]) {
-        activeTouches[id] = { lastX: x, lastY: y, distance: 0, lastTime: 0 };
-    }
-
-    const touchState = activeTouches[id];
-
-    if (now - touchState.lastTime < MIN_CLICK_INTERVAL) {
+    if (now - lastClickTime < MIN_CLICK_INTERVAL) {
         return;
     }
 
-    touchState.lastTime = now;
-    touchState.lastX = x;
-    touchState.lastY = y;
+    if (x === lastRecordedX && y === lastRecordedY) {
+        samePointCount++;
+        if (samePointCount > 15) return;
+    } else {
+        samePointCount = 0;
+    }
+
+    lastClickTime = now;
+    lastRecordedX = x;
+    lastRecordedY = y;
+
+    activeTouches[id] = {
+        lastX: x,
+        lastY: y,
+        distance: 0
+    };
 
     addLove();
 }
@@ -374,6 +383,9 @@ function processTouchMove(id, x, y) {
     if (!touchState) return;
 
     const now = Date.now();
+    if (now - lastClickTime < MIN_CLICK_INTERVAL) {
+        return;
+    }
 
     const dx = x - touchState.lastX;
     const dy = y - touchState.lastY;
@@ -381,12 +393,10 @@ function processTouchMove(id, x, y) {
 
     touchState.distance += dist;
 
-    if (touchState.distance >= 35) {
-        if (now - touchState.lastTime >= MIN_CLICK_INTERVAL) {
-            touchState.distance = 0;
-            touchState.lastTime = now;
-            addLove();
-        }
+    if (touchState.distance >= 40) {
+        touchState.distance = 0;
+        lastClickTime = now;
+        addLove();
     }
 
     touchState.lastX = x;
