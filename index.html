@@ -2,80 +2,62 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>햄스터 쓰다듬기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>햄스터 키우기</title>
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-
-    <!-- 로그인 화면 -->
-    <div id="login-screen">
+    <div id="login-screen" class="container">
         <h1>🐹 햄스터 키우기</h1>
-        <p>집사의 닉네임과 비밀번호를 입력하세요!</p>
-        <input type="text" id="nickname-input" placeholder="닉네임 입력" maxlength="10">
-        <br><br>
-        <input type="password" id="password-input" placeholder="비밀번호 입력" maxlength="15">
-        <br><br>
-        <button id="start-btn">시작하기 / 로그인</button>
+        <div class="input-group">
+            <input type="text" id="nickname-input" placeholder="닉네임 입력 (최대 10자)" maxlength="10">
+            <input type="password" id="password-input" placeholder="비밀번호 입력">
+            <button id="start-btn">시작하기 / 로그인</button>
+        </div>
     </div>
 
-    <!-- 게임 화면 -->
-    <div id="game-screen" class="hidden">
-        <h1>🐹 <span id="player-name"></span>님의 햄스터!</h1>
-
-        <!-- 부스터 & 자동 영역 -->
-        <div id="boost-container">
-            <div class="boost-info">
-                ※ 해바라기씨 획득: 10레벨마다 1개 (Lv.110 이후 행복도 25,000당 1개)
-            </div>
-            
-            <p style="margin: 6px 0; font-size: 0.85em; color: #555; font-weight: bold;">
-                🌻 보유 해바라기씨 : <span id="seeds">0</span>개
-            </p>
-
-            <button id="use-boost-btn">
-                🔥 2배 피버 타임 (10초간)
-            </button>
-
-            <div id="boost-status"></div>
-            <div id="auto-status"></div>
+    <div id="game-screen" class="container hidden">
+        <div class="header">
+            <span id="player-name"></span>님 환영합니다!
+            <button id="change-nick-btn">닉네임 변경</button>
+            <button id="rank-btn">🏆 랭킹 보기</button>
+            <button id="reset-btn">로그아웃</button>
         </div>
 
-        <img id="hamster" src="hamster.png" alt="햄스터">
+        <div class="stats">
+            <p>레벨: <span id="level">1</span></p>
+            <p>애정도: <span id="love">0 / 100</span></p>
+            <p>🌻 해바라기씨: <span id="seeds">0</span>개</p>
+        </div>
 
-        <p>❤️ 행복도 : <span id="love">0</span></p>
-        <p>⭐ 레벨 : <span id="level">1</span></p>
+        <div class="boost-area">
+            <button id="use-boost-btn">🔥 피버 타임 (씨앗 1개 소모)</button>
+            <p id="boost-status"></p>
+        </div>
 
-        <button id="rank-btn">🏆 실시간 랭킹 보기</button>
-        <br>
-        <button id="change-nick-btn">✏️ 닉네임 변경</button>
-        <br>
-        <button id="reset-btn">로그아웃 / 다른 계정 접속</button>
+        <div class="hamster-container">
+            <img id="hamster" src="hamster.png" alt="햄스터">
+        </div>
 
-        <!-- 실시간 채팅 -->
-        <div id="chat-container">
-            <h3>💬 실시간 집사 채팅방</h3>
+        <div class="chat-container">
             <div id="chat-box"></div>
-            <div id="chat-input-box">
-                <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." maxlength="50">
+            <div class="chat-input-group">
+                <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
                 <button id="send-chat-btn">전송</button>
             </div>
         </div>
     </div>
 
-    <!-- 랭킹 모달 -->
     <div id="rank-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🏆 햄스터 명예의 전당 Top 10</h2>
+            <h2>🏆 명예의 전당 🏆</h2>
             <ol id="rank-list"></ol>
             <button id="close-rank-btn">닫기</button>
         </div>
     </div>
 
     <script src="script.js"></script>
-
 </body>
 </html>
