@@ -25,6 +25,10 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
+// 🛑 오토클릭 방지용 변수
+let lastClickTime = 0;
+const MIN_CLICK_INTERVAL = 50; // 클릭 간격 제한 (50ms = 1초당 최대 20회)
+
 let isBoostActive = false;
 let boostTimeLeft = 0;
 let boostTimer = null;
@@ -409,7 +413,15 @@ if (chatInput) {
     });
 }
 
+// 🛑 오토클릭 방지가 추가된 쓰다듬기 시작 함수
 function startPetting(x, y) {
+    const now = Date.now();
+    // 이전 클릭 후 50ms 미만 간격으로 연속 들어오면 무시 (초당 최대 20회 제한)
+    if (now - lastClickTime < MIN_CLICK_INTERVAL) {
+        return;
+    }
+    lastClickTime = now;
+
     petting = true;
     lastX = x;
     lastY = y;
@@ -439,11 +451,16 @@ function stopPetting() {
     petting = false;
 }
 
-hamster.addEventListener("mousedown", (e) => startPetting(e.clientX, e.clientY));
+// 마우스 / 터치 이벤트 (e.isTrusted 검증 추가)
+hamster.addEventListener("mousedown", (e) => {
+    if (!e.isTrusted) return; // 프로그래밍 방식의 가상 클릭 차단
+    startPetting(e.clientX, e.clientY);
+});
 document.addEventListener("mouseup", stopPetting);
 hamster.addEventListener("mousemove", (e) => movePetting(e.clientX, e.clientY));
 
 hamster.addEventListener("touchstart", (e) => {
+    if (!e.isTrusted) return; // 가상 터치 이벤트 차단
     e.preventDefault();
     const touch = e.touches[0];
     startPetting(touch.clientX, touch.clientY);
@@ -464,7 +481,6 @@ function addLove() {
     love += amount;
 
     if (level >= 110) {
-        // 만렙 달성 이후 행복도 25,000당 해바라기씨 1개 지급
         const currentRewardLevel = Math.floor(love / 25000);
         if (currentRewardLevel > lastMaxLoveReward) {
             const gainedSeeds = currentRewardLevel - lastMaxLoveReward;
