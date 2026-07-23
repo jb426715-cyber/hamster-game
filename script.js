@@ -25,9 +25,13 @@ let lastX = 0;
 let lastY = 0;
 let petDistance = 0;
 
-// 🛑 오토클릭 방지용 변수
+// 🛑 강화된 오토클릭 방지용 변수
 let lastClickTime = 0;
-const MIN_CLICK_INTERVAL = 50; // 클릭 간격 제한 (50ms = 1초당 최대 20회)
+const MIN_CLICK_INTERVAL = 100; // 100ms 간격 제한 (초당 최대 10회)
+
+let samePointCount = 0;
+let lastRecordedX = -1;
+let lastRecordedY = -1;
 
 let isBoostActive = false;
 let boostTimeLeft = 0;
@@ -413,14 +417,28 @@ if (chatInput) {
     });
 }
 
-// 🛑 오토클릭 방지가 추가된 쓰다듬기 시작 함수
+// 🛑 강화된 오토클릭 방지 로직
 function startPetting(x, y) {
     const now = Date.now();
-    // 이전 클릭 후 50ms 미만 간격으로 연속 들어오면 무시 (초당 최대 20회 제한)
+
+    // 1. 100ms 이내의 연속 입력 차단 (초당 최대 10회 제한)
     if (now - lastClickTime < MIN_CLICK_INTERVAL) {
         return;
     }
+
+    // 2. 정확히 같은 좌표만 계속 누르는 오토클릭 차단
+    if (x === lastRecordedX && y === lastRecordedY) {
+        samePointCount++;
+        if (samePointCount > 10) { // 동일 좌표 10회 초과 시 무시
+            return;
+        }
+    } else {
+        samePointCount = 0;
+    }
+
     lastClickTime = now;
+    lastRecordedX = x;
+    lastRecordedY = y;
 
     petting = true;
     lastX = x;
@@ -432,14 +450,21 @@ function startPetting(x, y) {
 function movePetting(x, y) {
     if (!petting) return;
 
+    const now = Date.now();
+    // 드래그(문지르기) 모션도 속도 제한 적용 (100ms)
+    if (now - lastClickTime < MIN_CLICK_INTERVAL) {
+        return;
+    }
+
     const dx = x - lastX;
     const dy = y - lastY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     petDistance += distance;
 
-    while (petDistance >= 50) {
-        petDistance -= 50;
+    if (petDistance >= 50) {
+        petDistance = 0;
+        lastClickTime = now;
         addLove();
     }
 
@@ -451,16 +476,16 @@ function stopPetting() {
     petting = false;
 }
 
-// 마우스 / 터치 이벤트 (e.isTrusted 검증 추가)
+// 마우스 / 터치 이벤트 (e.isTrusted 검증)
 hamster.addEventListener("mousedown", (e) => {
-    if (!e.isTrusted) return; // 프로그래밍 방식의 가상 클릭 차단
+    if (!e.isTrusted) return;
     startPetting(e.clientX, e.clientY);
 });
 document.addEventListener("mouseup", stopPetting);
 hamster.addEventListener("mousemove", (e) => movePetting(e.clientX, e.clientY));
 
 hamster.addEventListener("touchstart", (e) => {
-    if (!e.isTrusted) return; // 가상 터치 이벤트 차단
+    if (!e.isTrusted) return;
     e.preventDefault();
     const touch = e.touches[0];
     startPetting(touch.clientX, touch.clientY);
