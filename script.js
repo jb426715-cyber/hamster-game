@@ -37,9 +37,11 @@ let isBoostActive = false;
 let boostTimeLeft = 0;
 let boostTimer = null;
 
+// 🤖 자동 쓰다듬기 시간 유지 변수
+let lastAutoTime = 0; // 마지막으로 자동 쓰다듬기가 실행된 시각 (타임스탬프)
+let autoCooldownLeft = 0;
 let isAutoActive = false;
 let autoTimeLeft = 0;
-let autoCooldownLeft = 3 * 60 * 60;
 let autoInterval = null;
 let autoCooldownTimer = null;
 
@@ -113,6 +115,7 @@ function loadData(inputName, inputPw) {
             maxLove = parseInt(data.maxLove, 10) || 100;
             seeds = parseInt(data.seeds, 10) || 0;
             lastMaxLoveReward = parseInt(data.lastMaxLoveReward, 10) || 0;
+            lastAutoTime = parseInt(data.lastAutoTime, 10) || 0; // 불러오기 추가
 
             const expectedSeedsFromLevel = Math.floor(level / 10);
             if (level < 110 && seeds < expectedSeedsFromLevel) {
@@ -124,6 +127,7 @@ function loadData(inputName, inputPw) {
             maxLove = 100;
             seeds = 0;
             lastMaxLoveReward = 0;
+            lastAutoTime = 0;
             alert("✨ 신규 계정이 등록되었습니다!");
         }
 
@@ -151,7 +155,8 @@ function saveData() {
         love: love,
         maxLove: maxLove,
         seeds: seeds,
-        lastMaxLoveReward: lastMaxLoveReward
+        lastMaxLoveReward: lastMaxLoveReward,
+        lastAutoTime: lastAutoTime // 저장 추가
     });
 }
 
@@ -261,22 +266,28 @@ if (useBoostBtn) {
     });
 }
 
+// 🤖 타임스탬프 기반 자동 쓰다듬기 시스템
 function startAutoSystem() {
     if (autoCooldownTimer) clearInterval(autoCooldownTimer);
 
     autoCooldownTimer = setInterval(() => {
         if (!isAutoActive) {
-            autoCooldownLeft--;
+            const now = Date.now();
+            const COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3시간 (밀리초)
+            const elapsedTime = now - lastAutoTime;
 
-            if (autoStatusText) {
-                const hours = Math.floor(autoCooldownLeft / 3600);
-                const mins = Math.floor((autoCooldownLeft % 3600) / 60);
-                const secs = autoCooldownLeft % 60;
-                autoStatusText.textContent = `🤖 자동 쓰다듬기 대기 중 (${hours}시간 ${mins}분 ${secs}초 남음)`;
-            }
-
-            if (autoCooldownLeft <= 0) {
+            if (elapsedTime >= COOLDOWN_MS) {
+                autoCooldownLeft = 0;
                 triggerAutoPetting();
+            } else {
+                autoCooldownLeft = Math.ceil((COOLDOWN_MS - elapsedTime) / 1000);
+
+                if (autoStatusText) {
+                    const hours = Math.floor(autoCooldownLeft / 3600);
+                    const mins = Math.floor((autoCooldownLeft % 3600) / 60);
+                    const secs = autoCooldownLeft % 60;
+                    autoStatusText.textContent = `🤖 자동 쓰다듬기 대기 중 (${hours}시간 ${mins}분 ${secs}초 남음)`;
+                }
             }
         }
     }, 1000);
@@ -284,7 +295,10 @@ function startAutoSystem() {
 
 function triggerAutoPetting() {
     isAutoActive = true;
-    autoTimeLeft = 300;
+    autoTimeLeft = 300; // 5분 (300초)
+    lastAutoTime = Date.now(); // 실행 시점 기록
+    saveData(); // DB에 시각 즉시 저장
+
     sendLocalPushNotification("🤖 자동 클릭 작동!", "5분간 자동으로 햄스터를 쓰다듬습니다!");
 
     if (autoInterval) clearInterval(autoInterval);
@@ -305,7 +319,6 @@ function triggerAutoPetting() {
             clearInterval(autoInterval);
             clearInterval(autoActiveTimer);
             isAutoActive = false;
-            autoCooldownLeft = 3 * 60 * 60;
             if (autoStatusText) autoStatusText.textContent = "";
             alert("🤖 5분간의 자동 쓰다듬기가 종료되었습니다!");
         }
@@ -429,7 +442,7 @@ function startPetting(x, y) {
     // 2. 정확히 같은 좌표만 계속 누르는 오토클릭 차단
     if (x === lastRecordedX && y === lastRecordedY) {
         samePointCount++;
-        if (samePointCount > 10) { // 동일 좌표 10회 초과 시 무시
+        if (samePointCount > 10) {
             return;
         }
     } else {
@@ -451,7 +464,6 @@ function movePetting(x, y) {
     if (!petting) return;
 
     const now = Date.now();
-    // 드래그(문지르기) 모션도 속도 제한 적용 (100ms)
     if (now - lastClickTime < MIN_CLICK_INTERVAL) {
         return;
     }
@@ -476,7 +488,7 @@ function stopPetting() {
     petting = false;
 }
 
-// 마우스 / 터치 이벤트 (e.isTrusted 검증)
+// 마우스 / 터치 이벤트
 hamster.addEventListener("mousedown", (e) => {
     if (!e.isTrusted) return;
     startPetting(e.clientX, e.clientY);
